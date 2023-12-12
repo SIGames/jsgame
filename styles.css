@@ -1,0 +1,40 @@
+@font-face {
+    font-family: Lora;
+    src: url(Lora-VariableFont_wght.ttf);
+}
+@font-face {
+    font-family: DMSans;
+    src: url(DMSans-VariableFont_opsz\,wght.ttf);
+}
+h2:first-child {
+    margin-bottom: 10px;
+}
+
+.dealer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dealer .card {
+    width: 100px;
+    height: auto;
+    margin: 0 10px;
+}
+
+h2:last-child {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.hand {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hand .card {
+    width: 100px;
+    height: auto;
+    margin: 0 10px;
+}
