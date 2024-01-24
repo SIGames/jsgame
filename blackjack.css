@@ -1,0 +1,58 @@
+body {
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    background-color: #36502c;
+    color: #ecf0f1;
+    margin: 20px;
+}
+
+h2 {
+    color: #ecf0f1;
+}
+
+#dealer-cards, #your-cards {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+img {
+    width: 160px;
+    height: auto;
+    margin: 0 5px;
+}
+
+button {
+    width: 200px;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+    background-color: #34db58;
+    font-weight: bold;
+    color: #ecf0f1;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+#results {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+#hidden {
+    width: 160px;
+    height: auto;
+    margin: 0 5px;
+    opacity: 0.5;
+}
+
+.title{
+    font-size: 50px;
+    font-weight: bolder;
+}
