@@ -1,4 +1,3 @@
-// Declare variables to track the sum and ace count for the dealer and player
 let playerScore = 0;
 let dealerSum = 0;
 let yourSum = 0;
@@ -8,32 +7,32 @@ let hidden;
 let deck;
 let canHit = true;
 
-// Function to initialize the game when the "Start" button is clicked
+// Initialize player's name and wins from the cookie
+let playerName = getCookie("playerName") || "Player";
+let playerWins = parseInt(getCookie("playerWins")) || 0;
+
+window.onload = function() {
+  // Prompt for a username only if it doesn't exist
+  if (!getCookie("playerName")) {
+    playerName = prompt("Please enter your username:", playerName);
+    setCookie("playerName", playerName, 30);
+  }
+
+  // Display the initial wins
+  document.getElementById("player-wins").innerText = `Totale wins: ${playerWins}`;
+  document.getElementById("player-name").innerText = playerName;
+
+  startClick();
+};
+
 function startClick() {
   buildDeck();
   shuffleDeck();
   startGame();
 }
 
-
-
-// Function to create a deck of cards with different values and types
 function buildDeck() {
-  const values = [
-    "A",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-    "J",
-    "Q",
-    "K",
-  ];
+  const values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
   const types = ["C", "D", "H", "S"];
   deck = [];
 
@@ -44,7 +43,6 @@ function buildDeck() {
   }
 }
 
-// Function to shuffle the deck randomly
 function shuffleDeck() {
   for (let i = 0; i < deck.length; i++) {
     const j = Math.floor(Math.random() * deck.length);
@@ -52,41 +50,35 @@ function shuffleDeck() {
   }
 }
 
-// Function to start the game by drawing initial cards for the dealer and player
 function startGame() {
-    clearBoard();
-  
-    hidden = deck.pop();
-    updateDealerSum(hidden);
-  
-    // Laat de dealer kaarten trekken zolang de som minder dan 17 is
-    while (dealerSum < 17) {
-      drawCard("dealer-cards", updateDealerSum);
-    }
-  
-    for (let i = 0; i < 2; i++) {
-      drawCard("your-cards", updateYourSum);
-    }
-  
-    // Attach event listeners for the "Hit" and "Stay" buttons
-    document.getElementById("hit").addEventListener("click", hit);
-    document.getElementById("stay").addEventListener("click", stay);
+  clearBoard();
+
+  hidden = deck.pop();
+  updateDealerSum(hidden);
+
+  // Laat de dealer kaarten trekken zolang de som minder dan 17 is
+  while (dealerSum < 17) {
+    drawCard("dealer-cards", updateDealerSum);
   }
 
+  for (let i = 0; i < 2; i++) {
+    drawCard("your-cards", updateYourSum);
+  }
+
+  // Attach event listeners for the "Hit" and "Stay" buttons
+  document.getElementById("hit").addEventListener("click", hit);
+  document.getElementById("stay").addEventListener("click", stay);
+}
+
 function clearBoard() {
-  // Wis de kaarten van de dealer en de speler
   clearElement("dealer-cards");
   clearElement("your-cards");
 
-  // Reset de scores naar nul
   dealerSum = 0;
   yourSum = 0;
-
-  // Reset de aas tellingen naar nul
   dealerAceCount = 0;
   yourAceCount = 0;
 
-  // Update de scores op het scherm
   document.getElementById("dealer-sum").innerText = dealerSum;
   document.getElementById("your-sum").innerText = yourSum;
 
@@ -94,14 +86,11 @@ function clearBoard() {
 
   let container = document.getElementById("dealer-cards");
 
-  // Stel de eigenschappen van het img-element in
   hiddenImg.id = "hidden";
   hiddenImg.src = "./cards/BACK.png";
 
-  // Voeg het img-element toe aan de container
   container.appendChild(hiddenImg);
 
-  // Zet de 'hidden' kaart en kanHit variabelen terug naar hun oorspronkelijke staat
   hidden = null;
   canHit = true;
 }
@@ -113,7 +102,6 @@ function clearElement(elementId) {
   }
 }
 
-// Function to draw a card and update the sum for the specified player
 function drawCard(elementId, updateSumFunction) {
   if (!canHit) {
     return;
@@ -125,35 +113,29 @@ function drawCard(elementId, updateSumFunction) {
   updateSumFunction(card);
   document.getElementById(elementId).append(cardImg);
 
-  // Check if the player has busted after drawing a card
   if (reduceAce(yourSum, yourAceCount) > 21) {
     canHit = false;
+    endGame();
   }
 }
 
-// Event handler for the "Hit" button
 function hit() {
   drawCard("your-cards", updateYourSum);
 }
 
-// Event handler for the "Stay" button
 function stay() {
-  // Reduce aces if necessary, reveal dealer's hidden card, determine the winner, and display results
   dealerSum = reduceAce(dealerSum, dealerAceCount);
   yourSum = reduceAce(yourSum, yourAceCount);
 
   canHit = false;
 
-  // Controleer of 'hidden' niet null is voordat je de 'src' eigenschap instelt
   if (hidden !== null) {
     document.getElementById("hidden").src = `./cards/${hidden}.png`;
   }
 
-  let message = determineWinner();
-  displayResults(message);
+  endGame();
 }
 
-// Function to update the dealer's sum and ace count based on the drawn card
 function updateDealerSum(card) {
   dealerSum += getValue(card);
   dealerAceCount += checkAce(card);
@@ -171,11 +153,11 @@ function determineWinner() {
   if (yourSum > 21) {
     message = "You Lose!";
   } else if (dealerSum > 21) {
-    message = "You win!";
+    message = "Win!";
   } else if (yourSum === dealerSum) {
     message = "Tie!";
   } else if (yourSum > dealerSum) {
-    message = "You Win!";
+    message = "Win!";
   } else {
     message = "You Lose!";
   }
@@ -207,4 +189,45 @@ function reduceAce(playerSum, playerAceCount) {
     playerAceCount -= 1;
   }
   return playerSum;
+}
+
+function endGame() {
+  let message = determineWinner();
+
+  // Update player's wins
+  if (message === "Win!") {
+    playerWins++;
+    setCookie("playerWins", playerWins, 30);
+    document.getElementById("player-wins").innerText = `Totale wins: ${playerWins}`;
+  }
+
+  // Update the DOM with player's name and wins
+  document.getElementById("player-name").innerText = playerName;
+
+  displayResults(message);
+}
+
+
+
+
+// Rest of your existing functions...
+
+// Helper function to get a cookie by name
+function getCookie(name) {
+  const cookies = document.cookie.split("; ");
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].split("=");
+    if (cookie[0] === name) {
+      return cookie[1];
+    }
+  }
+  return null;
+}
+
+// Helper function to set a cookie
+function setCookie(name, value, days) {
+  const expirationDate = new Date();
+  expirationDate.setTime(expirationDate.getTime() + days * 24 * 60 * 60 * 1000);
+  const expires = "expires=" + expirationDate.toUTCString();
+  document.cookie = name + "=" + value + "; " + expires + "; path=/";
 }
